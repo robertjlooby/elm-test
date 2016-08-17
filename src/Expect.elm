@@ -1,4 +1,4 @@
-module Expect exposing (Expectation, pass, fail, getFailure, equal, notEqual, atMost, lessThan, greaterThan, atLeast, true, false, onFail)
+module Expect exposing (Expectation, pass, fail, getFailure, equal, notEqual, equalLists, atMost, lessThan, greaterThan, atLeast, true, false, onFail)
 
 {-| A library to create `Expectation`s, which describe a claim to be tested.
 
@@ -67,6 +67,49 @@ which argument is which:
 equal : a -> a -> Expectation
 equal =
     compareWith "Expect.equal" (==)
+
+
+equalLists : List a -> List a -> Expectation
+equalLists expected actual =
+    if expected == actual then
+        pass
+    else
+        case compare (List.length actual) (List.length expected) of
+            GT ->
+                reportFailure "is longer than the expected:" expected actual
+                    |> fail
+
+            LT ->
+                reportFailure "is shorter than the expected:" expected actual
+                    |> fail
+
+            EQ ->
+                List.map2 (,) actual expected
+                    |> List.indexedMap (,)
+                    |> List.filterMap
+                        (\( index, ( e, a ) ) ->
+                            if e == a then
+                                Nothing
+                            else
+                                Just ( index, e, a )
+                        )
+                    |> List.head
+                    |> Maybe.map
+                        (\( index, e, a ) ->
+                            fail
+                                <| reportFailure
+                                    ("differed at index "
+                                        ++ toString index
+                                        ++ ". Expected `"
+                                        ++ toString e
+                                        ++ "`, got `"
+                                        ++ toString a
+                                        ++ "`."
+                                    )
+                                    expected
+                                    actual
+                        )
+                    |> Maybe.withDefault pass
 
 
 {-| Passes if the arguments are not equal.

@@ -44,5 +44,14 @@ readmeExample =
                         |> String.reverse
                         |> String.reverse
                         |> Expect.equal randomlyGeneratedString
+            , test "asserting equal lists is cool"
+                <| \() ->
+                    Expect.equalLists [ 1, 2, 3 ] [ 1, 2 ]
+            , test "asserting equal lists is cool"
+                <| \() ->
+                    Expect.equalLists [ 1, 2 ] [ 1, 2, 3 ]
+            , test "asserting equal lists is cool"
+                <| \() ->
+                    Expect.equalLists [ 1, 3, 2 ] [ 1, 2, 3 ]
             ]
         ]
