@@ -345,13 +345,13 @@ onFail str expectation =
             Test.Expectation.Fail given str
 
 
-reportFailure : String -> String -> String -> String
+reportFailure : String -> a -> b -> String
 reportFailure comparison expected actual =
-    [ actual
+    [ toString actual
     , "╷"
     , "│ " ++ comparison
     , "╵"
-    , expected
+    , toString expected
     ]
         |> String.join "\n"
 
@@ -361,4 +361,4 @@ compareWith label compare expected actual =
     if compare actual expected then
         pass
     else
-        fail (reportFailure label (toString expected) (toString actual))
+        fail (reportFailure label expected actual)
